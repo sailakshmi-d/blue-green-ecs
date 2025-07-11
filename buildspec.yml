@@ -6,45 +6,57 @@ env:
     AWS_ACCOUNT_ID: 185187793433
     IMAGE_NAME: bluegreen
     
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: us-east-1
+    AWS_ACCOUNT_ID: 185187793433
+    IMAGE_NAME: bluegreen
+
 phases:
   install:
     runtime-versions:
-      nodejs: 12  
+      nodejs: 12
     commands:
-      # - echo Installing Mocha...
-      # - npm install -g mocha (test)
+      - echo Installing source NPM dependencies...
+      - npm install
+      - echo Setting up Docker...
+      - nohup /usr/local/bin/dockerd \
+          --host=unix:///var/run/docker.sock \
+          --host=tcp://127.0.0.1:2375 \
+          --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+
   pre_build:
     commands:
-      - echo  Installing   source NPM dependencies...
-      - npm install
-      # - npm install  unit.js
-      - echo Setting up docker
-      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
-      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
       - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 185187793433.dkr.ecr.us-east-1.amazonaws.com     
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
   build:
     commands:
       - echo Build started on `date`
-      - echo Compiling the Node.js code
-      # - mocha test.js
+      - echo Compiling the Node.js code...
+      # Run any tests here, e.g., mocha test.js
+
   post_build:
     commands:
-      - docker image build -t bluegreen  .
-      - docker image tag bluegreen:latest 185187793433.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
-      - echo image name =  bluegreen:latest
-      - echo image url = 185187793433.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
-      - docker push 185187793433.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
+      - echo Building Docker image...
+      - docker build -t $IMAGE_NAME .
+      - docker tag $IMAGE_NAME:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest
+      - echo Pushing Docker image to ECR...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest
       - echo Writing image definitions file...
-      - printf '{"ImageURI":"'"185187793433.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest"}' > imageDetail.json
-      - cat imageDetail.json
+      - printf '[{"name":"%s","imageUri":"%s"}]' $IMAGE_NAME "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:latest" > imagedefinitions.json
+      - cat imagedefinitions.json
       - echo Build completed on `date`
+
 artifacts:
-  files: 
-    - 'image*.json'
-    - 'appspec.yml'
-    - 'taskdef.json'
+  files:
+    - imagedefinitions.json
+    - appspec.yml
+    - taskdef.json
+
   secondary-artifacts:
     DefinitionArtifact:
       files:
@@ -52,4 +64,5 @@ artifacts:
         - taskdef.json
     ImageArtifact:
       files:
-        - imageDetail.json
+        - imagedefinitions.json
+
