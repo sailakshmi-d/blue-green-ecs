@@ -19,7 +19,7 @@ const ENV = 'DEV';
 const app = express();
 app.get('/', (req, res) => {
   res.statusCode = 200;
-  const msg = 'Hello from blue green deployment version1121 by sahoo!';
+  const msg = 'Hello from blue green deployment';
   res.send(getPage(msg));
 });
 
