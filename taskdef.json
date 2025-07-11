@@ -1,6 +1,6 @@
 {
   "ipcMode": null,
-  "executionRoleArn": "arn:aws:iam::711610755347:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::185187793433:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "dnsSearchDomains": null,
@@ -64,7 +64,7 @@
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-east-1:711610755347:task-definition/ecs-blue-green-cluster:1",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:185187793433:task-definition/bluegreen_taskdef:1",
   "family": "ecs-blue-green-cluster",
   "requiresAttributes": [
     {
