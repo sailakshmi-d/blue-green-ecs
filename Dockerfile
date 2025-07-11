@@ -1,6 +1,6 @@
 
 #FROM public.ecr.aws/bitnami/node:latest
-FROM bswsahoo111/blue-green:latest
+FROM sailakshmii/india:latest
 
 # Create app directory
 WORKDIR /usr/src/app
