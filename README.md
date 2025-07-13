@@ -152,9 +152,6 @@ docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
    - Source: GitHub repo
    - Build: CodeBuild project
    - Deploy: CodeDeploy ECS application
-2. Make sure pipeline includes artifacts:
-   - `imagedefinitions.json`
-   - `appspec.yaml` (see below)
 
 
 ```
