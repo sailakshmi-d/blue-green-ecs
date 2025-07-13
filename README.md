@@ -66,15 +66,15 @@ bluegreen-ecs/
 ### Step 2: Build & Push Docker Image
 
 1. SSH into your EC2 instance (or local terminal with Docker installed)
+----
 
-```bash
 aws ecr get-login-password --region us-east-1 | \
 docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
 
 docker build -t bluegreen .
 docker tag bluegreen:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
 docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
-```
+
 
 ---
 
@@ -129,7 +129,7 @@ docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
   - Set environment to use Docker runtime
   - Grant necessary IAM permissions
 
-
+---
 
 ###  Step 8: Create CodeDeploy ECS Application
 
@@ -153,8 +153,6 @@ docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/bluegreen:latest
    - Build: CodeBuild project
    - Deploy: CodeDeploy ECS application
 
-
-```
 
 ---
 
